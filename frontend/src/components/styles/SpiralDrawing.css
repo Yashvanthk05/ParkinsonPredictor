@@ -1,0 +1,72 @@
+.drawing-container {
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 25px;
+  background: #fff;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+  color: #111;
+}
+
+.drawing-container textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #d0d0d0;
+}
+
+.drawing-actions {
+  margin-top: 12px;
+}
+
+.result-box {
+  color: black;
+  margin-top: 16px;
+}
+
+.drawing-type {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.drawing-preview {
+  margin-top: 10px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.drawing-preview img {
+  max-width: 220px;
+  max-height: 220px;
+  border-radius: 6px;
+  border: 1px solid #e6e6e6;
+}
+
+.preview-actions button {
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .drawing-preview {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .drawing-preview img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+.result-box.positive {
+  background-color: lightgreen;
+}
+
+.result-box.negative {
+  background-color: lightcoral;
+}
