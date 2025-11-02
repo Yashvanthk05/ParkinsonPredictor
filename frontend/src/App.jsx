@@ -5,6 +5,7 @@ import VoiceMeasurement from "./components/VoiceMeasurement";
 import KeyboardTyping from "./components/KeyboardTyping";
 import SpiralDrawing from "./components/SpiralDrawing";
 import CombinedPredict from "./components/CombinedPredict";
+import ModelExplain from "./components/ModelExplain";
 import "./App.css";
 
 function Home() {
@@ -72,6 +73,22 @@ function Home() {
               Upload or describe a drawing to analyze tremor characteristics.
             </p>
           </a>
+
+          <a
+            href='/explain'
+            className='card'
+            style={{
+              padding: 16,
+              textDecoration: "none",
+              border: "1px solid #e6e6e6",
+              borderRadius: 8,
+            }}
+          >
+            <h3>Model Explain (CNN)</h3>
+            <p style={{ margin: 0, color: "#444" }}>
+              See how Conv2D, MaxPool, and Dense layers work visually.
+            </p>
+          </a>
         </div>
       </section>
     </div>
@@ -89,6 +106,7 @@ export default function AppEntry() {
           <Route path='/keyboard' element={<KeyboardTyping />} />
           <Route path='/drawing' element={<SpiralDrawing />} />
           <Route path='/combined' element={<CombinedPredict />} />
+          <Route path='/explain' element={<ModelExplain />} />
           <Route
             path='*'
             element={<div className='app-container'>Not Found</div>}

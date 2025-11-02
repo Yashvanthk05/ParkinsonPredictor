@@ -20,6 +20,9 @@ export default function Navbar() {
           <li>
             <Link to='/combined'>Combined</Link>
           </li>
+          <li>
+            <Link to='/explain'>Model Explain</Link>
+          </li>
         </ul>
       </div>
     </nav>

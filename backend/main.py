@@ -10,6 +10,8 @@ import pandas as pd
 from PIL import Image
 import io
 import tensorflow as tf
+import base64
+import math
 from scipy.stats import skew, kurtosis
 from typing import Literal,List, Dict, Any,Optional 
 from model import TypingInput, VoiceInput
@@ -169,6 +171,170 @@ async def predict_wave(file: UploadFile = File(...)):
     except Exception as e:
         print(f"Error in /predictwave: {e}")
         raise HTTPException(status_code=500, detail=f"Image prediction failed: {str(e)}")
+
+
+def _ensure_wave_intermediate_model():
+    """Build or reuse an intermediate model that outputs feature maps for all layers.
+    Returns (intermediate_model, layer_meta) where layer_meta is a list of dicts with
+    name, type, and output_shape for each output layer.
+    """
+    global _wave_intermediate_model, _wave_layer_meta
+    try:
+        _ = _wave_intermediate_model  # noqa
+        _ = _wave_layer_meta  # noqa
+    except NameError:
+        _wave_intermediate_model = None
+        _wave_layer_meta = None
+
+    if _wave_intermediate_model is not None:
+        return _wave_intermediate_model, _wave_layer_meta
+
+    def collect_feature_layers(model: tf.keras.Model):
+        outs_local = []
+        meta_local = []
+        for lyr in getattr(model, 'layers', []):
+            # Obtain output shape robustly
+            shp = None
+            try:
+                shp = getattr(lyr, 'output_shape', None)
+                if shp is None:
+                    out = getattr(lyr, 'output', None)
+                    shp = getattr(out, 'shape', None)
+            except Exception:
+                shp = None
+
+            rank = None
+            shp_list = None
+            if shp is not None:
+                if isinstance(shp, (tuple, list)):
+                    shp_list = list(shp)
+                    rank = len(shp_list)
+                elif isinstance(shp, tf.TensorShape):
+                    shp_list = shp.as_list()
+                    rank = shp.rank
+                else:
+                    try:
+                        shp_list = list(shp)
+                        rank = len(shp_list)
+                    except Exception:
+                        shp_list = None
+
+            # We want 4D activations: (batch, H, W, C)
+            if rank == 4 and shp_list is not None:
+                try:
+                    outs_local.append(lyr.output)
+                    meta_local.append({
+                        "name": lyr.name,
+                        "type": lyr.__class__.__name__,
+                        "shape": shp_list,
+                    })
+                except Exception:
+                    # Some layers may not be accessible this way; skip
+                    continue
+        return outs_local, meta_local
+
+    # Try primary wave model first
+    candidates = []
+    if 'wavemodel' in globals() and isinstance(wavemodel, tf.keras.Model):
+        candidates.append(("wavemodel", wavemodel))
+    # Try optional wavemodel2 if present on disk
+    try:
+        wavemodel2 = tf.keras.models.load_model("wavemodel2.h5")
+        candidates.append(("wavemodel2", wavemodel2))
+    except Exception:
+        pass
+    # As a last resort, try spiralmodel (if it's a CNN)
+    if 'spiralmodel' in globals() and isinstance(spiralmodel, tf.keras.Model):
+        candidates.append(("spiralmodel", spiralmodel))
+
+    for name, model in candidates:
+        outs, meta = collect_feature_layers(model)
+        if outs:
+            _wave_intermediate_model = tf.keras.Model(inputs=model.input, outputs=outs)
+            _wave_layer_meta = meta
+            return _wave_intermediate_model, _wave_layer_meta
+
+    raise RuntimeError("No 4D feature map layers found in candidate models")
+
+
+def _activation_to_mosaic(act: np.ndarray, max_channels: int = 16, tile_cols: int = 4) -> Image.Image:
+    """Convert a 4D activation (1, H, W, C) into a tiled PIL image.
+    Only the first max_channels channels are included.
+    """
+    if act.ndim != 4:
+        raise ValueError("Activation must be 4D (1, H, W, C)")
+    _, h, w, c = act.shape
+    c = min(c, max_channels)
+    # Normalize each channel to 0..255
+    tiles = []
+    for i in range(c):
+        ch = act[0, :, :, i]
+        ch_min = float(np.min(ch))
+        ch_max = float(np.max(ch))
+        if ch_max > ch_min:
+            ch_norm = (ch - ch_min) / (ch_max - ch_min)
+        else:
+            ch_norm = np.zeros_like(ch)
+        img = (ch_norm * 255.0).astype(np.uint8)
+        tiles.append(Image.fromarray(img, mode='L'))
+
+    tile_rows = int(math.ceil(c / tile_cols))
+    mosaic = Image.new('L', (w * tile_cols, h * tile_rows))
+    for idx, tile in enumerate(tiles):
+        r = idx // tile_cols
+        col = idx % tile_cols
+        mosaic.paste(tile, (col * w, r * h))
+    return mosaic
+
+
+def _img_to_data_url(img: Image.Image) -> str:
+    buf = io.BytesIO()
+    img.save(buf, format='PNG')
+    b64 = base64.b64encode(buf.getvalue()).decode('ascii')
+    return f"data:image/png;base64,{b64}"
+
+
+@app.post("/explainwave")
+async def explain_wave(file: UploadFile = File(...)):
+    """Return per-layer feature map mosaics for the wave CNN."""
+    try:
+        image_bytes = await file.read()
+        # Preprocess input to 128x128x1 [0,1]
+        img_tensor = preprocess_image(image_bytes)
+
+        # Create a displayable preprocessed image
+        display_arr = (img_tensor[0, :, :, 0] * 255.0).astype(np.uint8)
+        display_img = Image.fromarray(display_arr, mode='L')
+        display_url = _img_to_data_url(display_img)
+
+        inter_model, meta = _ensure_wave_intermediate_model()
+        activations = inter_model.predict(img_tensor)
+
+        # If only one layer, Keras returns a single array, normalize to list
+        if not isinstance(activations, list):
+            activations = [activations]
+
+        layers_payload = []
+        for m, act in zip(meta, activations):
+            try:
+                mosaic = _activation_to_mosaic(act, max_channels=16, tile_cols=4)
+                mosaic_url = _img_to_data_url(mosaic)
+            except Exception:
+                mosaic_url = None
+            layers_payload.append({
+                "name": m["name"],
+                "type": m["type"],
+                "shape": m["shape"],
+                "mosaic": mosaic_url,
+            })
+
+        return {
+            "input": {"image": display_url, "shape": [128, 128, 1]},
+            "layers": layers_payload,
+        }
+    except Exception as e:
+        print(f"Error in /explainwave: {e}")
+        raise HTTPException(status_code=500, detail=f"Explain failed: {str(e)}")
 
 
 @app.get("/")

@@ -6,7 +6,7 @@
 
 /* inner container used by pages to center content while allowing full-width background */
 .app-container {
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 24px;
 }

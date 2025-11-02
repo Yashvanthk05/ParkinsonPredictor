@@ -8,6 +8,7 @@ export default function SpiralDrawing() {
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [type, setType] = useState("spiral"); // 'spiral' or 'wave'
+  const API_BASE = import.meta?.env?.VITE_API_BASE || "http://localhost:8000";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -57,11 +58,10 @@ export default function SpiralDrawing() {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      const baseUrl = "http://localhost:8000";
       const endpoint =
         type === "spiral"
-          ? `${baseUrl}/predictspiral`
-          : `${baseUrl}/predictwave`;
+          ? `${API_BASE}/predictspiral`
+          : `${API_BASE}/predictwave`;
 
       const resp = await fetch(endpoint, {
         method: "POST",
@@ -86,7 +86,6 @@ export default function SpiralDrawing() {
     <div className='app-container'>
       <div className='drawing-container'>
         <h1>Spiral & Wave Drawing Predictor</h1>
-        
 
         <form
           onSubmit={(e) => {
