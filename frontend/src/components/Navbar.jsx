@@ -4,18 +4,21 @@ import "./styles/Navbar.css";
 
 export default function Navbar() {
   return (
-    <nav className="navbar">
-      <div className="navbar-inner">
-        <div className="navbar-logo">Parkinson's Predictor</div>
-        <ul className="navbar-links">
+    <nav className='navbar'>
+      <div className='navbar-inner'>
+        <div className='navbar-logo'>Parkinson's Predictor</div>
+        <ul className='navbar-links'>
           <li>
-            <Link to="/voice">Voice Measurements</Link>
+            <Link to='/voice'>Voice Measurements</Link>
           </li>
           <li>
-            <Link to="/keyboard">Typing</Link>
+            <Link to='/keyboard'>Typing</Link>
           </li>
           <li>
-            <Link to="/drawing">Spiral & Wave</Link>
+            <Link to='/drawing'>Spiral & Wave</Link>
+          </li>
+          <li>
+            <Link to='/combined'>Combined</Link>
           </li>
         </ul>
       </div>

@@ -35,7 +35,7 @@ try:
     voicemodel = xgb.XGBClassifier()
     voicemodel.load_model("parkinsons_xgb.json")
     
-    typingmodel = joblib.load("parkinsons_model_pipeline_svc.pkl")
+    typingmodel = joblib.load("voting_model.joblib")
 
 except Exception as e:
     print(f"Error loading models: {e}")
@@ -50,8 +50,8 @@ NUMERICAL_FEATURES = [
     'mean_diff_LR_RL_LatencyTime', 'mean_diff_LL_RR_LatencyTime',
     'mean_diff_L_R_HoldTime'
 ]
-CATEGORICAL_FEATURES = ['Gender']
-ALL_FEATURES_ORDER = NUMERICAL_FEATURES + CATEGORICAL_FEATURES 
+CATEGORICAL_FEATURES_OHE = ['Gender_Female', 'Gender_Male']
+ALL_FEATURES_ORDER = NUMERICAL_FEATURES + CATEGORICAL_FEATURES_OHE
 
 def extract_keystroke_features(log: List[Dict[str, Any]], gender: str) -> pd.DataFrame:
     import pandas as pd
@@ -97,7 +97,8 @@ def extract_keystroke_features(log: List[Dict[str, Any]], gender: str) -> pd.Dat
     features["mean_diff_LL_RR_LatencyTime"] = features.get("LL_LatencyTime_mean", 0) - features.get("RR_LatencyTime_mean", 0)
     features["mean_diff_L_R_HoldTime"] = features.get("L_HoldTime_mean", 0) - features.get("R_HoldTime_mean", 0)
 
-    features["Gender"] = gender
+    features["Gender_Female"] = 1 if gender == "Female" else 0
+    features["Gender_Male"]= 1 if gender == "Male" else 0
 
     df_features = pd.DataFrame([features]).fillna(0)
     

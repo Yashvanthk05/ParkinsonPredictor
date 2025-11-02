@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Literal,List
+from typing import Literal, List, Optional 
 
 class VoiceInput(BaseModel):
     MDVP_Fhi_Hz_: float
@@ -28,9 +28,9 @@ class KeyLogEntry(BaseModel):
     key: str
     hand: Literal["L","R"]
     timestamp: float
-    holdTime: float | None = None
-    latency: float | None = None
-    direction: str | None = None
+    holdTime: Optional[float] = None
+    latency: Optional[float] = None
+    direction: Optional[str] = None
 
 class TypingInput(BaseModel):
     log: List[KeyLogEntry]
