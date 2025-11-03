@@ -1,7 +1,7 @@
 import React, { useMemo, useRef, useState } from "react";
 import "./styles/CombinedPredict.css";
 
-const API_BASE = import.meta?.env?.VITE_API_BASE || "http://localhost:8000";
+const API_BASE = "https://parkinsonpredictor.onrender.com";
 
 export default function CombinedPredict() {
 

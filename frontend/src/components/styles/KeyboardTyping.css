@@ -134,6 +134,7 @@ textarea:focus {
   background: #f0f0f0;
   padding: 10px;
   border-radius: 8px;
+  overflow-x: auto;
 }
 .kb-row {
   display: flex;
@@ -163,4 +164,32 @@ textarea:focus {
 }
 .kb-space {
   width: 200px;
+}
+
+/* Mobile adjustments */
+@media (max-width: 900px) {
+  .app-container {
+    margin: 10px auto;
+    padding: 16px;
+  }
+  .typing-layout {
+    flex-direction: column;
+  }
+  .typing-main,
+  .typing-log {
+    min-width: 0;
+    width: 100%;
+  }
+  .kb-key {
+    min-width: 26px;
+    height: 26px;
+    font-size: 12px;
+  }
+  .kb-space {
+    width: 40vw;
+    max-width: 160px;
+  }
+  .log-preview {
+    max-height: 360px;
+  }
 }

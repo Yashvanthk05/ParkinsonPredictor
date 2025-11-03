@@ -4,7 +4,7 @@
   padding: 25px;
   background-color: #ffffff;
   border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   font-family: Arial, sans-serif;
   color: #000;
 }
@@ -94,4 +94,19 @@ button:disabled {
 
 .result-box.negative {
   background-color: lightcoral;
+}
+
+/* Mobile adjustments */
+@media (max-width: 900px) {
+  .voice-container {
+    margin: 16px auto;
+    padding: 16px;
+  }
+  .grid-container {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+  }
+  button {
+    padding: 10px;
+  }
 }

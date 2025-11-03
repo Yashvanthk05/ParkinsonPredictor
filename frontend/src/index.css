@@ -1,72 +1,112 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  /* Slack-inspired light palette */
+  --color-bg: #ffffff;
+  --color-text: #1f2937; /* slate-800 */
+  --color-subtle: #6b7280; /* slate-500 */
+  --color-border: #e5e7eb; /* gray-200 */
+  --color-card: #ffffff;
+  --color-accent: #611f69; /* Slack purple */
+  --color-accent-contrast: #ffffff;
+  --sidebar-bg: #f6f7f9;
+  --sidebar-border: #e5e7eb;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 2px 12px rgba(0, 0, 0, 0.08);
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+
+  color-scheme: light;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  /* light default color scheme for the app */
-  color-scheme: light;
-  color: #111111;
-  background-color: #ffffff;
-
-  font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+* {
+  box-sizing: border-box;
 }
-a:hover {
-  color: #535bf2;
+
+html,
+body,
+#root {
+  height: 100%;
 }
 
 body {
   margin: 0;
-  /* Use normal flow so the page behaves like a typical website */
-  display: block;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #ffffff;
-  color: #111;
-  -webkit-font-smoothing: antialiased;
+  background: var(--color-bg);
+  color: var(--color-text);
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+h1,
+h2,
+h3 {
+  color: var(--color-text);
+  margin: 0 0 var(--space-3);
+}
+p {
+  color: var(--color-subtle);
+  margin: 0 0 var(--space-3);
 }
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  background-color: #f8fafc; /* slate-50 */
+  color: var(--color-text);
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: all 0.15s ease;
 }
 button:hover {
-  border-color: #646cff;
+  background: #eef2f7;
 }
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+button.primary {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  border-color: var(--color-accent);
+}
+button.primary:hover {
+  filter: brightness(0.95);
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-card);
+  color: var(--color-text);
+}
+
+.card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
 }

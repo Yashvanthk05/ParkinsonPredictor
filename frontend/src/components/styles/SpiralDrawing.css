@@ -63,6 +63,17 @@
   }
 }
 
+/* Mobile adjustments */
+@media (max-width: 900px) {
+  .drawing-container {
+    margin: 16px auto;
+    padding: 16px;
+  }
+  .drawing-type {
+    flex-wrap: wrap;
+  }
+}
+
 .result-box.positive {
   background-color: lightgreen;
 }

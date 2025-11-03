@@ -8,7 +8,7 @@ export default function SpiralDrawing() {
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [type, setType] = useState("spiral"); // 'spiral' or 'wave'
-  const API_BASE = import.meta?.env?.VITE_API_BASE || "http://localhost:8000";
+  const API_BASE = "https://parkinsonpredictor.onrender.com";
 
   const handleSubmit = async (e) => {
     e.preventDefault();

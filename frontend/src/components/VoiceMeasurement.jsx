@@ -142,11 +142,14 @@ export default function VoiceMeasurement() {
     }
 
     try {
-      const response = await fetch("http://localhost:8000/predictvoice", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(processedData),
-      });
+      const response = await fetch(
+        "https://parkinsonpredictor.onrender.com/predictvoice",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(processedData),
+        }
+      );
       if (!response.ok) {
         const errData = await response.json();
         throw new Error(errData.detail || "Network response was not ok");

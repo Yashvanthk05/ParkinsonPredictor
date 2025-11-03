@@ -32,10 +32,6 @@ export default function KeyboardTyping() {
 
   const handleKeyDown = (e) => {
     const key = e.key;
-    if (key.length > 1 && key !== "Backspace" && key !== " ") {
-
-      return;
-    }
     const now = performance.now();
     if (!keyDownTime.current[key]) keyDownTime.current[key] = now;
 
@@ -69,12 +65,13 @@ export default function KeyboardTyping() {
       const newLog = [...prev];
       for (let i = newLog.length - 1; i >= 0; i--) {
         if (newLog[i].key === key && newLog[i].holdTime === null) {
-          newLog[i] = { ...newLog[i], holdTime: holdTime };
+          newLog[i].holdTime = holdTime;
           break;
         }
       }
       return newLog;
     });
+
     delete keyDownTime.current[key];
   };
 
@@ -90,13 +87,6 @@ export default function KeyboardTyping() {
       return;
     }
 
-    if (log.length < 10) {
-      // Add a check for minimum log length
-      setError("Please type more of the paragraph to gather sufficient data.");
-      setIsLoading(false);
-      return;
-    }
-
     if (!gender) {
       setError("Please select your gender.");
       setIsLoading(false);
@@ -104,11 +94,14 @@ export default function KeyboardTyping() {
     }
 
     try {
-      const response = await fetch("http://localhost:8000/predicttyping", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ log, gender }),
-      });
+      const response = await fetch(
+        "https://parkinsonpredictor.onrender.com/predicttyping",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ log, gender }),
+        }
+      );
 
       if (!response.ok) {
         const errData = await response.json();
@@ -118,106 +111,104 @@ export default function KeyboardTyping() {
       const data = await response.json();
       setResult(data);
     } catch (err) {
-      setError(`Prediction failed: ${err.message}`);
+      setError(`Prediction failed: ${err}`);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <>
-      <div className='app-container'>
-        <div className='typing-layout'>
-          <div className='typing-main'>
-            <h1>Keyboard Typing Predictor</h1>
-            <p>Please type the following paragraph exactly as shown:</p>
-            <blockquote className='paragraph'>{PARAGRAPH}</blockquote>
+    <div className='app-container'>
+      <div className='typing-layout'>
+        <div className='typing-main'>
+          <h1>Keyboard Typing Predictor</h1>
+          <p>Please type the following paragraph exactly as shown:</p>
+          <blockquote className='paragraph'>{PARAGRAPH}</blockquote>
 
-            <form onSubmit={handleSubmit} className='typing-form'>
-              <div className='form-row'>
-                <label>
-                  Gender:
-                  <select
-                    value={gender}
-                    onChange={(e) => setGender(e.target.value)}
-                  >
-                    <option value=''>Select Gender</option>
-                    <option value='Male'>Male</option>
-                    <option value='Female'>Female</option>
-                  </select>
-                </label>
-              </div>
-
-              <div className='typing-area'>
-                <textarea
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  onKeyUp={handleKeyUp}
-                  placeholder='Type the paragraph here...'
-                  rows={8}
-                />
-
-                <div className='visual-keyboard' aria-hidden>
-                  {[
-                    "`1234567890-=",
-                    "qwertyuiop[]\\",
-                    "asdfghjkl;'",
-                    "zxcvbnm,./",
-                    " ",
-                  ].map((row, idx) => (
-                    <div key={idx} className={`kb-row kb-row-${idx}`}>
-                      {row === " " ? (
-                        <div className='kb-key kb-space' />
-                      ) : (
-                        Array.from(row).map((k) => (
-                          <div
-                            key={k}
-                            className={`kb-key ${
-                              activeKey &&
-                              activeKey.toLowerCase() === k.toLowerCase()
-                                ? "active"
-                                : ""
-                            }`}
-                          >
-                            {k}
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className='form-row'>
-                <button type='submit' disabled={isLoading}>
-                  {isLoading ? "Analyzing..." : "Analyze Typing"}
-                </button>
-              </div>
-            </form>
-
-            {error && <div className='error-box'>{error}</div>}
-
-            {result && (
-              <div className='result-box'>
-                <h2>
-                  {result.prediction === 1
-                    ? "Positive for Parkinson's"
-                    : "Likely Healthy"}
-                </h2>
-                {/* <p>Confidence: {(result.probability * 100).toFixed(2)}%</p> */}
-              </div>
-            )}
-          </div>
-
-          <aside className='typing-log'>
-            <h3>Key Log (Last 200)</h3>
-            <div className='log-preview'>
-              <pre>{JSON.stringify(log.slice(-200), null, 2)}</pre>
+          <form onSubmit={handleSubmit} className='typing-form'>
+            <div className='form-row'>
+              <label>
+                Gender:
+                <select
+                  value={gender}
+                  onChange={(e) => setGender(e.target.value)}
+                >
+                  <option value=''>Select Gender</option>
+                  <option value='Male'>Male</option>
+                  <option value='Female'>Female</option>
+                </select>
+              </label>
             </div>
-          </aside>
+
+            <div className='typing-area'>
+              <textarea
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                onKeyDown={handleKeyDown}
+                onKeyUp={handleKeyUp}
+                placeholder='Type the paragraph here...'
+                rows={8}
+              />
+
+              <div className='visual-keyboard' aria-hidden>
+                {[
+                  "`1234567890-=",
+                  "qwertyuiop[]\\",
+                  "asdfghjkl;'",
+                  "zxcvbnm,./",
+                  " ",
+                ].map((row, idx) => (
+                  <div key={idx} className={`kb-row kb-row-${idx}`}>
+                    {row === " " ? (
+                      <div className='kb-space' />
+                    ) : (
+                      Array.from(row).map((k) => (
+                        <div
+                          key={k}
+                          className={`kb-key ${
+                            activeKey &&
+                            activeKey.toLowerCase() === k.toLowerCase()
+                              ? "active"
+                              : ""
+                          }`}
+                        >
+                          {k}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className='form-row'>
+              <button type='submit' disabled={isLoading}>
+                {isLoading ? "Analyzing..." : "Analyze Typing"}
+              </button>
+            </div>
+          </form>
+
+          {error && <div className='error-box'>{error}</div>}
+
+          {result && (
+            <div className='result-box'>
+              <h2>
+                {result.prediction === 1
+                  ? "Positive for Parkinson's"
+                  : "Likely Healthy"}
+              </h2>
+              {/* <p>Confidence: {(result.probability * 100).toFixed(2)}%</p> */}
+            </div>
+          )}
         </div>
+
+        <aside className='typing-log'>
+          <h3>Key Log</h3>
+          <div className='log-preview'>
+            <pre>{JSON.stringify(log.slice(-200), null, 2)}</pre>
+          </div>
+        </aside>
       </div>
-    </>
+    </div>
   );
 }

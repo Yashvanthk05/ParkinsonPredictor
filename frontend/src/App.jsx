@@ -98,21 +98,23 @@ function Home() {
 export default function AppEntry() {
   return (
     <Router>
-      <Navbar />
-      <main style={{ padding: "20px" }}>
-        <Routes>
-          <Route path='/' element={<Home />} />
-          <Route path='/voice' element={<VoiceMeasurement />} />
-          <Route path='/keyboard' element={<KeyboardTyping />} />
-          <Route path='/drawing' element={<SpiralDrawing />} />
-          <Route path='/combined' element={<CombinedPredict />} />
-          <Route path='/explain' element={<ModelExplain />} />
-          <Route
-            path='*'
-            element={<div className='app-container'>Not Found</div>}
-          />
-        </Routes>
-      </main>
+      <div className='app-shell'>
+        <Navbar />
+        <main className='app-main'>
+          <Routes>
+            <Route path='/' element={<Home />} />
+            <Route path='/voice' element={<VoiceMeasurement />} />
+            <Route path='/keyboard' element={<KeyboardTyping />} />
+            <Route path='/drawing' element={<SpiralDrawing />} />
+            <Route path='/combined' element={<CombinedPredict />} />
+            <Route path='/explain' element={<ModelExplain />} />
+            <Route
+              path='*'
+              element={<div className='app-container'>Not Found</div>}
+            />
+          </Routes>
+        </main>
+      </div>
     </Router>
   );
 }

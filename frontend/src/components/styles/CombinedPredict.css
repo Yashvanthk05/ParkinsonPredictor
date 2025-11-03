@@ -6,7 +6,6 @@
 
 .combined-header {
   background: #fff;
-  border: 1px solid #e6e6e6;
   border-radius: 8px;
   padding: 20px;
 }
@@ -21,7 +20,7 @@
 
 .combined-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 16px;
 }
 
@@ -105,5 +104,9 @@
 @media (max-width: 720px) {
   .combined-grid {
     grid-template-columns: 1fr;
+  }
+  .combined-header,
+  .panel {
+    padding: 12px;
   }
 }
